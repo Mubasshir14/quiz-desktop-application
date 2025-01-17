@@ -17,7 +17,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
 import java.util.List;
 
 public class JoinLiveQuiz {
@@ -97,21 +96,16 @@ public class JoinLiveQuiz {
 
         mainContainer = new VBox(25);
         mainContainer.setAlignment(Pos.CENTER);
-//        mainContainer.setPadding(new Insets(30));
         mainContainer.setStyle(MAIN_CONTAINER_STYLE);
         System.out.println(userName + " " + pin);
 
-        // Create header with user info
         VBox headerContainer = createHeader(userName, pin);
-
-        // Create progress section
         HBox progressContainer = createProgressSection();
 
         questionsContainer = new VBox(20);
         questionsContainer.setStyle(CONTAINER_STYLE);
         questionsContainer.setPadding(new Insets(25));
         questionsContainer.setAlignment(Pos.CENTER);
-//        questionsContainer.setMaxWidth(600);
 
         if (questions != null && !questions.isEmpty()) {
             showQuestion(currentQuestionIndex);
@@ -121,7 +115,6 @@ public class JoinLiveQuiz {
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-        // Add fade-in animation
         FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), mainContainer);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
@@ -135,7 +128,6 @@ public class JoinLiveQuiz {
         VBox header = new VBox(15);
         header.setAlignment(Pos.CENTER);
 
-        // Create user avatar
         Circle avatar = new Circle(30);
         avatar.setFill(Color.web("#3498db"));
         Text initials = new Text(userName.substring(0, 1).toUpperCase());
@@ -174,7 +166,6 @@ public class JoinLiveQuiz {
         questionsContainer.getChildren().clear();
         Question question = questions.get(index);
 
-        // Update progress with animation
         Timeline progressTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(progressBar.progressProperty(), (double) index / questions.size())),
@@ -194,12 +185,10 @@ public class JoinLiveQuiz {
         VBox optionsContainer = new VBox(12);
         String[] options = question.getOptions();
 
-        // Add options with animation delay
         for (int i = 0; i < options.length; i++) {
             Button optionButton = createOptionButton(options[i], i);
             final int optionIndex = i;
 
-            // Add fade and slide animation
             optionButton.setOpacity(0);
             optionButton.setTranslateX(-20);
 
@@ -229,9 +218,10 @@ public class JoinLiveQuiz {
         nextButton.setDisable(true);
         nextButton.setOnAction(e -> moveToNextQuestion());
 
-
         questionsContainer.getChildren().addAll(questionLabel, optionsContainer, nextButton);
 
+        // Start the timer for this question
+        startQuestionTimer(question.getTime(), nextButton, optionsContainer);
     }
 
     private Button createOptionButton(String text, int index) {
@@ -257,9 +247,9 @@ public class JoinLiveQuiz {
                               VBox optionsContainer) {
         if (questionTimer != null) {
             questionTimer.stop();
+            timerLabel.setText("Time stopped");
         }
 
-        // Add click animation
         ScaleTransition clickEffect = new ScaleTransition(Duration.millis(100), optionButton);
         clickEffect.setToX(0.95);
         clickEffect.setToY(0.95);
@@ -295,7 +285,6 @@ public class JoinLiveQuiz {
             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
             """, isCorrect ? "#27ae60" : "#e74c3c"));
 
-        // Add slide-in animation
         feedbackLabel.setTranslateY(-20);
         feedbackLabel.setOpacity(0);
 
@@ -312,116 +301,52 @@ public class JoinLiveQuiz {
         slideIn.play();
 
         questionsContainer.getChildren().add(2, feedbackLabel);
-
-    }
-
-//    private void showQuizResults() {
-//        questionsContainer.getChildren().clear();
-//
-//        VBox resultsContainer = new VBox(25);
-//        resultsContainer.setAlignment(Pos.CENTER);
-//        resultsContainer.setPadding(new Insets(30));
-//
-//        // Calculate percentage
-//        double percentage = (double) score / questions.size() * 100;
-//
-//        // Create circular score display
-//        Circle scoreCircle = new Circle(60);
-//        scoreCircle.setFill(Color.web("#3498db"));
-//
-//        Label scoreLabel = new Label(String.format("%.0f%%", percentage));
-//        scoreLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
-//        StackPane scoreDisplay = new StackPane(scoreCircle, scoreLabel);
-//
-//        Label congratsLabel = new Label(getPerformanceMessage(percentage));
-//        congratsLabel.setStyle("""
-//            -fx-font-size: 24px;
-//            -fx-font-weight: bold;
-//            -fx-text-fill: #2c3e50;
-//            -fx-text-alignment: center;
-//            -fx-wrap-text: true;
-//            """);
-//
-//        Label detailsLabel = new Label(String.format("You got %d out of %d questions correct",
-//                score, questions.size()));
-//        detailsLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 16px;");
-//
-//        Button finishButton = new Button("Finish Quiz");
-//        finishButton.setStyle(NEXT_BUTTON_STYLE);
-//        finishButton.setOnAction(e -> primaryStage.close());
-//
-//        // Add elements with fade-in animation
-//        resultsContainer.setOpacity(0);
-//        resultsContainer.getChildren().addAll(scoreDisplay, congratsLabel, detailsLabel, finishButton);
-//
-//        FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), resultsContainer);
-//        fadeIn.setFromValue(0);
-//        fadeIn.setToValue(1);
-//        fadeIn.play();
-//
-//        questionsContainer.getChildren().add(resultsContainer);
-//    }
-
-
-    public String getUserName() {
-        return userName;
-    }
-    public String getPin() {
-        return pin;
-    }
-    public int getScore() {
-        return score;
     }
 
     private void showQuizResults() {
-    questionsContainer.getChildren().clear();
+        questionsContainer.getChildren().clear();
 
-    VBox resultsContainer = new VBox(25);
-    resultsContainer.setAlignment(Pos.CENTER);
-    resultsContainer.setPadding(new Insets(30));
+        VBox resultsContainer = new VBox(25);
+        resultsContainer.setAlignment(Pos.CENTER);
+        resultsContainer.setPadding(new Insets(30));
 
-    // Calculate percentage
-    double percentage = (double) score / questions.size() * 100;
+        double percentage = (double) score / questions.size() * 100;
 
-    // Create circular score display
-    Circle scoreCircle = new Circle(60);
-    scoreCircle.setFill(Color.web("#3498db"));
+        Circle scoreCircle = new Circle(60);
+        scoreCircle.setFill(Color.web("#3498db"));
 
-    Label scoreLabel = new Label(String.format("%.0f%%", percentage));
-    scoreLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
-    StackPane scoreDisplay = new StackPane(scoreCircle, scoreLabel);
+        Label scoreLabel = new Label(String.format("%.0f%%", percentage));
+        scoreLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        StackPane scoreDisplay = new StackPane(scoreCircle, scoreLabel);
 
-    Label congratsLabel = new Label(getPerformanceMessage(percentage));
-    congratsLabel.setStyle("""
-        -fx-font-size: 24px;
-        -fx-font-weight: bold;
-        -fx-text-fill: #2c3e50;
-        -fx-text-alignment: center;
-        -fx-wrap-text: true;
-        """);
+        Label congratsLabel = new Label(getPerformanceMessage(percentage));
+        congratsLabel.setStyle("""
+            -fx-font-size: 24px;
+            -fx-font-weight: bold;
+            -fx-text-fill: #2c3e50;
+            -fx-text-alignment: center;
+            -fx-wrap-text: true;
+            """);
 
-    Label detailsLabel = new Label(String.format("You got %d out of %d questions correct",
-            score, questions.size()));
-    detailsLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 16px;");
+        Label detailsLabel = new Label(String.format("You got %d out of %d questions correct",
+                score, questions.size()));
+        detailsLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 16px;");
 
-    Button finishButton = new Button("Finish Quiz");
-    finishButton.setStyle(NEXT_BUTTON_STYLE);
-    finishButton.setOnAction(e -> primaryStage.close());
-    System.out.println("pin" + pin + "usrname" + userName + "score" + score) ;
+        Button finishButton = new Button("Finish Quiz");
+        finishButton.setStyle(NEXT_BUTTON_STYLE);
+        finishButton.setOnAction(e -> primaryStage.close());
 
-    postResultsToBackend(getUserName(), getPin(), getScore());
+        System.out.println("pin" + pin + "usrname" + userName + "score" + score);
+        postResultsToBackend(getUserName(), getPin(), getScore());
 
-    Button leaderboardButton = new Button("View Leaderboard");
-    leaderboardButton.setStyle(NEXT_BUTTON_STYLE);
+        Button leaderboardButton = new Button("View Leaderboard");
+        leaderboardButton.setStyle(NEXT_BUTTON_STYLE);
         leaderboardButton.setOnAction(e -> {
-            // Create a TextInputDialog to ask the user for the room PIN
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("ROOM PIN");
             dialog.setHeaderText("ROOM PIN REQUIRED");
             dialog.setContentText("PLEASE ENTER ROOM PIN:");
 
-
-            // Add custom styles to the dialog
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #1a2a6c, #b21f1f, #fdbb2d);" +
@@ -431,11 +356,9 @@ public class JoinLiveQuiz {
                             "-fx-background-radius: 15px;" +
                             "-fx-padding: 20px;" +
                             "-fx-font-family: 'Arial';" +
-                            "-fx-font-size: 16px;" +
-                            "-fx-text-fill: white;"
+                            "-fx-font-size: 16px;" +"-fx-text-fill: white;"
             );
 
-            // Style the header text
             dialogPane.lookup(".header-panel").setStyle(
                     "-fx-font-size: 20px;" +
                             "-fx-font-weight: bold;" +
@@ -443,13 +366,11 @@ public class JoinLiveQuiz {
                             "-fx-alignment: center;"
             );
 
-            // Style the content text
             dialogPane.lookup(".content").setStyle(
                     "-fx-font-size: 14px;" +
                             "-fx-text-fill: #e0e0e0;"
             );
 
-            // Style the buttons
             dialogPane.lookupButton(ButtonType.OK).setStyle(
                     "-fx-background-color: #ff4b2b;" +
                             "-fx-text-fill: white;" +
@@ -469,27 +390,23 @@ public class JoinLiveQuiz {
                             "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);"
             );
 
-            // Wait for the user's input
             dialog.showAndWait().ifPresent(roomPIN -> {
-                // Navigate to the Leaderboard with the provided room PIN
                 Leaderboard leaderboard = new Leaderboard(primaryStage, roomPIN);
                 primaryStage.setScene(leaderboard.getScene());
                 System.out.println("Room PIN entered: " + roomPIN);
             });
         });
 
+        resultsContainer.setOpacity(0);
+        resultsContainer.getChildren().addAll(scoreDisplay, congratsLabel, detailsLabel, finishButton, leaderboardButton);
 
-    // Add elements with fade-in animation
-    resultsContainer.setOpacity(0);
-    resultsContainer.getChildren().addAll(scoreDisplay, congratsLabel, detailsLabel, finishButton, leaderboardButton);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), resultsContainer);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
 
-    FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), resultsContainer);
-    fadeIn.setFromValue(0);
-    fadeIn.setToValue(1);
-    fadeIn.play();
-
-    questionsContainer.getChildren().add(resultsContainer);
-}
+        questionsContainer.getChildren().add(resultsContainer);
+    }
 
     private void postResultsToBackend(String userName, String pin, int score) {
         String url = "http://localhost:8000/api/rooms/addParticipantWithMarks";
@@ -512,9 +429,6 @@ public class JoinLiveQuiz {
                     return null;
                 });
     }
-
-
-
 
     private String getPerformanceMessage(double percentage) {
         if (percentage >= 90) return "🏆 Outstanding!";
@@ -539,7 +453,6 @@ public class JoinLiveQuiz {
                 Button button = (Button) node;
                 int buttonIndex = optionsContainer.getChildren().indexOf(node);
                 if (buttonIndex == correctAnswer) {
-                    // Add highlight animation for correct answer
                     Timeline highlight = new Timeline(
                             new KeyFrame(Duration.ZERO,
                                     new KeyValue(button.scaleXProperty(), 1),
@@ -564,8 +477,6 @@ public class JoinLiveQuiz {
             if (node instanceof Button) {
                 Button button = (Button) node;
                 button.setDisable(true);
-
-                // Add fade effect for disabled buttons
                 button.setOpacity(0.7);
             }
         }
@@ -573,6 +484,18 @@ public class JoinLiveQuiz {
 
     public Scene getScene() {
         return scene;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     private void startQuestionTimer(int seconds, Button nextButton, VBox optionsContainer) {
@@ -586,7 +509,6 @@ public class JoinLiveQuiz {
         questionTimer.setOnFinished(event -> {
             timeLeft[0]--;
             if (timeLeft[0] >= 0) {
-                // Add pulse animation when time is running low (less than 5 seconds)
                 if (timeLeft[0] <= 5) {
                     timerLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 14px; -fx-font-weight: bold;");
 
@@ -624,7 +546,6 @@ public class JoinLiveQuiz {
             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
             """);
 
-        // Add bounce animation
         Timeline bounce = new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(timeUpLabel.translateYProperty(), -50),
