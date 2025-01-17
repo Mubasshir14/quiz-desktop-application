@@ -16,7 +16,7 @@ public class PostResult {
     }
 
     private static void postResultsToBackend(String userName, String pin, int score) {
-        String url = "http://localhost:8000/api/rooms/addParticipant";
+        String url = "https://quiz-six-khaki.vercel.app/api/rooms/addParticipant";
         String jsonInputString = String.format("{\"pin\": \"%s\", \"name\": \"%s\", \"marks\": %d}", pin, userName, score);
 
         HttpClient client = HttpClient.newHttpClient();

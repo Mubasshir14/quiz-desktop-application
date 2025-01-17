@@ -306,7 +306,7 @@ public class LiveQuizCategory {
 
             try {
                 String jsonInputString = "{\"pin\": \"" + pin + "\", \"userName\": \"" + userName + "\"}";
-                String response = HttpRequestJoin.sendPostRequest("http://localhost:8000/api/rooms/join", jsonInputString);
+                String response = HttpRequestJoin.sendPostRequest("https://quiz-six-khaki.vercel.app/api/rooms/join", jsonInputString);
 
                 if (response.contains("Error")) {
                     showAlert("Error", response);
@@ -353,7 +353,7 @@ public class LiveQuizCategory {
             String jsonString = mapper.writeValueAsString(room);
             System.out.println("Sending JSON to server: " + jsonString); // Add this debug line
 
-            String response = HttpRequest.sendPostRequest("http://localhost:8000/api/rooms/create", jsonString);
+            String response = HttpRequest.sendPostRequest("https://quiz-six-khaki.vercel.app/api/rooms/create", jsonString);
             System.out.println("Server Response: " + response);
 
             showAlert("Success", "Room created successfully with PIN: " + pin);
@@ -371,7 +371,7 @@ public class LiveQuizCategory {
 // Correct the Participant class instantiation
             Participant participantObj = new Participant(pin, participantName);
             String jsonString = mapper.writeValueAsString(participantObj);
-            String response = HttpRequest.sendPostRequest("http://localhost:8000/api/rooms/join", jsonString);
+            String response = HttpRequest.sendPostRequest("https://quiz-six-khaki.vercel.app/api/rooms/join", jsonString);
             System.out.println(response);
         } catch (Exception e) {
             e.printStackTrace();

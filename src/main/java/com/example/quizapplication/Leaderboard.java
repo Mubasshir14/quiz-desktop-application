@@ -52,12 +52,13 @@ public class Leaderboard {
         title.setTextFill(Color.WHITE);
         title.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);");
 
-        Label roomInfo = new Label("Room PIN: " + roomPIN);
+        Label roomInfo = new Label("ROOM: " + roomPIN);
         roomInfo.setFont(Font.font("Segoe UI", FontWeight.MEDIUM, 20));
         roomInfo.setTextFill(Color.web("#E0E0E0"));
 
         headerBox.getChildren().addAll(title, roomInfo);
 
+        // Table setup
         // Table setup
         TableView<Participant> table = new TableView<>();
         table.setStyle(
@@ -68,8 +69,14 @@ public class Leaderboard {
                         "-fx-font-size: 14px;"
         );
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.setMinHeight(400);
         table.setPrefWidth(800);
+
+// Wrap the TableView in a ScrollPane
+        ScrollPane scrollPane = new ScrollPane(table);
+        scrollPane.setFitToWidth(true); // Ensures the table takes the full width of the ScrollPane
+        scrollPane.setFitToHeight(true); // Allows scrolling if the height exceeds limits
+        scrollPane.setMinHeight(400); // Minimum height for the scrollable area
+        scrollPane.setPrefHeight(400); // Preferred height for the scrollable area
 
         // Custom column styling
         TableColumn<Participant, String> rankColumn = new TableColumn<>("Rank");
@@ -172,10 +179,10 @@ public class Leaderboard {
         buttonContainer.getChildren().addAll(exportPdfButton, exportExcelButton);
 
         // Add components to main container
-        leaderboardContainer.getChildren().addAll(headerBox, table, buttonContainer);
+        leaderboardContainer.getChildren().addAll(headerBox, scrollPane, buttonContainer);
 
         // Create scene and add animation
-        scene = new Scene(leaderboardContainer, 1200, 800);
+        scene = new Scene(leaderboardContainer, 1200, 700);
 
         // Add fade-in animation
         FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), leaderboardContainer);
@@ -366,7 +373,7 @@ public class Leaderboard {
     private List<Participant> fetchParticipants(String roomPIN) {
         List<Participant> participants = new ArrayList<>();
         try {
-            String url = "http://localhost:8000/api/rooms/results/" + roomPIN;
+            String url = "https://quiz-six-khaki.vercel.app/api/rooms/results/" + roomPIN;
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()

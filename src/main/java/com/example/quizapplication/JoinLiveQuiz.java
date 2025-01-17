@@ -409,7 +409,7 @@ public class JoinLiveQuiz {
     }
 
     private void postResultsToBackend(String userName, String pin, int score) {
-        String url = "http://localhost:8000/api/rooms/addParticipantWithMarks";
+        String url = "https://quiz-six-khaki.vercel.app/api/rooms/addParticipantWithMarks";
         String jsonInputString = String.format("{\"pin\": \"%s\", \"name\": \"%s\", \"marks\": %d}", pin, userName, score);
         System.out.println(jsonInputString);
         HttpClient client = HttpClient.newHttpClient();
